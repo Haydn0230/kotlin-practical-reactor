@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="c1_Introduction" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-04-28T15:22:05" hostname="SBGMLT6QL75J749" time="1.059">
+<testsuite name="c1_Introduction" tests="7" skipped="0" failures="0" errors="0" timestamp="2023-04-28T15:23:33" hostname="SBGMLT6QL75J749" time="3.104">
   <properties/>
-  <testcase name="leaving_blocking_world_behind()" classname="c1_Introduction" time="1.059"/>
+  <testcase name="leaving_blocking_world_behind()" classname="c1_Introduction" time="1.062"/>
+  <testcase name="hello_world()" classname="c1_Introduction" time="0.015"/>
+  <testcase name="nothing_happens_until_you_()" classname="c1_Introduction" time="1.003"/>
+  <testcase name="fortune_top_five()" classname="c1_Introduction" time="0.005"/>
+  <testcase name="unresponsive_service()" classname="c1_Introduction" time="1.012"/>
+  <testcase name="empty_service()" classname="c1_Introduction" time="0.001"/>
+  <testcase name="multi_result_service()" classname="c1_Introduction" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

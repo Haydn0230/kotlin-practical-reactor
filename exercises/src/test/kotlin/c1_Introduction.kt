@@ -1,9 +1,10 @@
 import org.junit.jupiter.api.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.Duration
 import java.util.Optional
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
+import java.util.function.Consumer
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -47,7 +48,7 @@ class c1_Introduction : IntroductionBase() {
     fun unresponsive_service() {
         val exception: Exception = assertThrows {
             val serviceResult: Mono<String> = unresponsiveService()
-            val result: String? = null //todo: change this line only
+            val result: String? = serviceResult.block(Duration.ofSeconds(1))
         }
         val expectedMessage = "Timeout on blocking read for 1"
         val actualMessage: String = exception.message!!
@@ -61,7 +62,7 @@ class c1_Introduction : IntroductionBase() {
     @Test
     fun empty_service() {
         val serviceResult: Mono<String> = emptyService()
-        val optionalServiceResult: Optional<String>? = null //todo: change this line only
+        val optionalServiceResult: Optional<String>? = serviceResult.blockOptional()
         assertTrue(optionalServiceResult != null)
         assertTrue(emptyServiceIsCalled.get())
     }
@@ -76,7 +77,7 @@ class c1_Introduction : IntroductionBase() {
     @Test
     fun multi_result_service() {
         val serviceResult: Flux<String> = multiResultService()
-        val result: String = serviceResult.toString() //todo: change this line only
+        val result: String? = serviceResult.blockFirst()
         assertEquals("valid result", result)
     }
 
@@ -88,7 +89,7 @@ class c1_Introduction : IntroductionBase() {
     @Test
     fun fortune_top_five() {
         val serviceResult: Flux<String> = fortuneTop5()
-        val results: List<String> = emptyList() //todo: change this line only
+        val results: MutableList<String>? = serviceResult.collectList().block()
         assertEquals(arrayListOf("Walmart", "Amazon", "Apple", "CVS Health", "UnitedHealth Group"), results)
         assertTrue(fortuneTop5ServiceIsCalled.get())
     }
@@ -110,7 +111,8 @@ class c1_Introduction : IntroductionBase() {
         val companyList: ArrayList<String> = arrayListOf()
         val serviceResult: Flux<String> = fortuneTop5()
         serviceResult
-            .doOnNext(companyList::add) //todo: add an operator here, don't use any blocking operator!
+            .doOnNext(companyList::add)
+            .subscribe()
         Thread.sleep(1000) //bonus: can you explain why this line is needed?
         assertEquals(arrayListOf("Walmart", "Amazon", "Apple", "CVS Health", "UnitedHealth Group"), companyList)
     }
@@ -129,8 +131,14 @@ class c1_Introduction : IntroductionBase() {
     @Throws(InterruptedException::class)
     fun leaving_blocking_world_behind() {
         val serviceCallCompleted: AtomicReference<Boolean> = AtomicReference(false)
-        val companyList: ArrayList<String> = arrayListOf()
-        fortuneTop5() //todo: change this line only
+        var companyList: ArrayList<String> = arrayListOf()
+        fortuneTop5()
+            .subscribe (
+                companyList::add,
+                {},
+                { serviceCallCompleted.set(true) }
+            )
+
         Thread.sleep(1000)
         assertTrue(serviceCallCompleted.get())
         assertEquals(arrayListOf("Walmart", "Amazon", "Apple", "CVS Health", "UnitedHealth Group"), companyList)
